@@ -15,9 +15,23 @@ import * as DomUtil from '../dom/DomUtil';
  *
  * @example
  *
+ * If you want to just bind a tooltip to marker:
+ *
  * ```js
  * marker.bindTooltip("my tooltip text").openTooltip();
  * ```
+ * Path overlays like polylines also have a `bindTooltip` method.
+ *
+ * A tooltip can be also standalone:
+ *
+ * ```js
+ * var tooltip = L.tooltip()
+ * 	.setLatLng(latlng)
+ * 	.setContent('Hello world!<br />This is a nice tooltip.')
+ * 	.addTo(map);
+ * ```
+ *
+ *
  * Note about tooltip offset. Leaflet takes two options in consideration
  * for computing tooltip offsetting:
  * - the `offset` Tooltip option: it defaults to [0, 0], and it's specific to one tooltip.
@@ -25,6 +39,8 @@ import * as DomUtil from '../dom/DomUtil';
  *   move it to the bottom. Negatives will move to the left and top.
  * - the `tooltipAnchor` Icon option: this will only be considered for Marker. You
  *   should adapt this value if you use a custom icon.
+ *
+ *
  */
 
 
@@ -76,6 +92,12 @@ export var Tooltip = DivOverlay.extend({
 		// Fired when a tooltip is opened in the map.
 		map.fire('tooltipopen', {tooltip: this});
 
+		// @namespace Tooltip
+		// @section Tooltip events
+		// @event tooltipopen: TooltipEvent
+		// Fired when the tooltip is opened
+		this.fire('tooltipopen', {tooltip: this}, true);
+
 		if (this._source) {
 			// @namespace Layer
 			// @section Tooltip events
@@ -93,6 +115,12 @@ export var Tooltip = DivOverlay.extend({
 		// @event tooltipclose: TooltipEvent
 		// Fired when a tooltip in the map is closed.
 		map.fire('tooltipclose', {tooltip: this});
+
+		// @namespace Tooltip
+		// @section Tooltip events
+		// @event tooltipclose: TooltipEvent
+		// Fired when the tooltip is closed
+		this.fire('tooltipclose', {tooltip: this}, true);
 
 		if (this._source) {
 			// @namespace Layer
@@ -178,6 +206,8 @@ export var Tooltip = DivOverlay.extend({
 	},
 
 	_updatePosition: function () {
+		if (!this._map || !this._latlng) { return; }
+
 		var pos = this._map.latLngToLayerPoint(this._latlng);
 		this._setPosition(pos);
 	},
@@ -309,14 +339,14 @@ Layer.include({
 		if (!this._tooltip.options.permanent) {
 			events.mouseover = this._openTooltip;
 			events.mouseout = this.closeTooltip;
-			if (this._tooltip.options.sticky) {
-				events.mousemove = this._moveTooltip;
-			}
 			if (Browser.touch) {
 				events.click = this._openTooltip;
 			}
 		} else {
 			events.add = this._openTooltip;
+		}
+		if (this._tooltip.options.sticky) {
+			events.mousemove = this._moveTooltip;
 		}
 		this[onOff](events);
 		this._tooltipHandlersAdded = !remove;
