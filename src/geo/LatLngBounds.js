@@ -232,6 +232,25 @@ LatLngBounds.prototype = {
 	// Returns `true` if the bounds are properly initialized.
 	isValid: function () {
 		return !!(this._southWest && this._northEast);
+	},
+
+	// @method getOriginBounds(): L.LatLngBounds
+	// Returns the origin bounds. Bounds near by 0 but lng greater then 0
+	getOriginBounds: function () {
+		var copy = new LatLngBounds(this.getNorthEast(), this.getSouthWest());
+
+		var modulo = copy._northEast.lng % 360;
+		var factor = copy._northEast.lng - modulo;
+
+		copy._northEast.lng -= factor;
+		copy._southWest.lng -= factor;
+
+		if (copy._northEast.lng < 0 || copy._southWest.lng < 0) {
+			copy._northEast.lng += 360;
+			copy._southWest.lng += 360;
+		}
+
+		return copy;
 	}
 };
 
