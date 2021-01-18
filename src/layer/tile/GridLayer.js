@@ -727,7 +727,18 @@ export var GridLayer = Layer.extend({
 
 		// don't load tile if it doesn't intersect the bounds in options
 		var tileBounds = this._tileCoordsToBounds(coords);
-		return latLngBounds(this.options.bounds).overlaps(tileBounds);
+
+		var optionBounds = latLngBounds(this.options.bounds).getOriginBounds();
+		if (!optionBounds.overlaps(tileBounds)) {
+			// check if the tile is in the bounds when we add / subtract 360.
+			var wrappedBounds = latLngBounds([optionBounds._southWest, optionBounds._northEast]);
+			var factor = wrappedBounds._northEast.lng < 0 ? 360 : -360;
+			wrappedBounds._southWest.lng += factor;
+			wrappedBounds._northEast.lng += factor;
+			return wrappedBounds.overlaps(tileBounds);
+		} else {
+			return true;
+		}
 	},
 
 	_keyToBounds: function (key) {
