@@ -144,6 +144,8 @@ describe("Map", function () {
 	});
 
 	describe("#setView", function () {
+		var expectedCenter = new L.LatLng(40.720412475732395, -74.00502204895021);
+
 		it("sets the view of the map", function () {
 			expect(map.setView([51.505, -0.09], 13)).to.be(map);
 			expect(map.getZoom()).to.be(13);
@@ -179,6 +181,65 @@ describe("Map", function () {
 			map.remove(); // clean up
 			expect(map.panBy.callCount).to.eql(1);
 			expect(map.panBy.args[0][1].duration).to.eql(13);
+		});
+
+		it("runs a chain of setView / panBy as one chain", function (done) {
+			this.timeout(10000);
+			container.style.height = '369px';
+			container.style.width = '1048px';
+			map.setView([40.722036, -73.990599], 15, {animate: false});
+			L.marker(map.getCenter()).addTo(map);
+
+			// run as chain with animation
+			map.setView([40.722036, -73.998599], map.zoom, {
+				animate: true,
+				duration: 2
+			}).panBy([-150, 0], {animate: true, duration: 2}).panBy([0, 50], {animate: true, duration: 2});
+
+			setTimeout(function(){
+				expect(map.getCenter()).to.eql(expectedCenter);
+				done();
+			},6100);
+
+		});
+		it("runs a chain of setView / panBy as single steps", function (done) {
+			this.timeout(3000);
+			container.style.height = '369px';
+			container.style.width = '1048px';
+			map.setView([40.722036, -73.990599], 15, {animate: false});
+			L.marker(map.getCenter()).addTo(map);
+
+			// run movement step by step
+			map.setView([40.722036, -73.998599], map.zoom, {
+				animate: true,
+				duration: 0.5
+			});
+
+			setTimeout(function(){
+				expect(map.getCenter()).to.not.eql(expectedCenter);
+				map.panBy([-150, 0], {animate: true, duration: 0.5});
+				setTimeout(function(){
+					expect(map.getCenter()).to.not.eql(expectedCenter);
+					map.panBy([0, 50], {animate: true, duration: 0.5});
+					setTimeout(function(){
+						expect(map.getCenter()).to.eql(expectedCenter);
+						done();
+					},700)
+				},700)
+			},700)
+		});
+		it("runs a chain of setView / panBy without animation", function () {
+			container.style.height = '369px';
+			container.style.width = '1048px';
+			map.setView([40.722036, -73.990599], 15, {animate: false});
+			L.marker(map.getCenter()).addTo(map);
+			// run movement without animation
+			map.setView([40.722036, -73.998599], map.zoom, {
+				animate: false,
+			});
+			map.panBy([-150, 0], {animate: false});
+			map.panBy([0, 50], {animate: false});
+			expect(map.getCenter()).to.eql(expectedCenter);
 		});
 	});
 

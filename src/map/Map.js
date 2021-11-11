@@ -132,6 +132,7 @@ export var Map = Evented.extend({
 		this._layers = {};
 		this._zoomBoundLayers = {};
 		this._sizeChanged = true;
+		this._animChain = [];
 
 		this._initContainer(id);
 		this._initLayout();
@@ -321,6 +322,10 @@ export var Map = Evented.extend({
 		// and makes them disappear or appear in the wrong place (slightly offset) #2602
 		if (options.animate !== true && !this.getSize().contains(offset)) {
 			this._resetView(this.unproject(this.project(this.getCenter()).add(offset)), this.getZoom());
+			return this;
+		}
+
+		if(this._addAnimToChain(offset, options) && !options._fromCache){
 			return this;
 		}
 
@@ -1588,6 +1593,10 @@ export var Map = Evented.extend({
 	_onPanTransitionEnd: function () {
 		DomUtil.removeClass(this._mapPane, 'leaflet-pan-anim');
 		this.fire('moveend');
+		if(this._animChain.length > 0){
+			var animObj = this._animChain.shift();
+			this.panBy(animObj.offset, animObj.options);
+		}
 	},
 
 	_tryAnimatedPan: function (center, options) {
@@ -1713,7 +1722,17 @@ export var Map = Evented.extend({
 		Util.requestAnimFrame(function () {
 			this._moveEnd(true);
 		}, this);
-	}
+	},
+
+	_addAnimToChain: function (offset, options){
+		if (this._panAnim && (this._animChain.length > 0 || this._panAnim._inProgress)) {
+			var _options = {_fromCache: true};
+			Util.extend(_options,options);
+			this._animChain.push({offset, options: _options});
+			return true;
+		}
+		return false;
+	},
 });
 
 // @section
