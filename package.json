@@ -123,5 +123,8 @@
     "gis",
     "map"
   ],
-  "license": "BSD-2-Clause"
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "jsdom": "^18.1.1"
+  }
 }
