@@ -37,6 +37,7 @@
     "!*.leafdoc"
   ],
   "scripts": {
+    "t1": "node ./spec/test.js",
     "docs": "node ./build/docs.js",
     "test": "karma start ./spec/karma.conf.js",
     "build": "npm run rollup && npm run uglify",
