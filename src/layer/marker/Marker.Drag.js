@@ -99,6 +99,7 @@ export var MarkerDrag = Handler.extend({
 	},
 
 	_onDragStart: function () {
+		this._startPosition = DomUtil.getPosition(this._draggable._element);
 		// @section Dragging events
 		// @event dragstart: Event
 		// Fired when the user starts dragging the marker.
@@ -148,8 +149,9 @@ export var MarkerDrag = Handler.extend({
 	_onDragEnd: function (e) {
 		// @event dragend: DragEndEvent
 		// Fired when the user stops dragging the marker.
-
 		 cancelAnimFrame(this._panRequest);
+
+		 e.distance = this._draggable._newPos.distanceTo(this._startPosition);
 
 		// @event moveend: Event
 		// Fired when the marker stops moving (because of dragging).
@@ -157,5 +159,31 @@ export var MarkerDrag = Handler.extend({
 		this._marker
 		    .fire('moveend')
 		    .fire('dragend', e);
-	}
+	},
+
+	_updateIcon() {
+		var dragging = Draggable._dragging === this._draggable;
+		var draggedTarget = this._draggable._lastTarget;
+		var lastEvent = this._draggable._lastEvent;
+
+		this.removeHooks();
+		this._draggable = null;
+		this.addHooks();
+
+		if (dragging) {
+
+			// prevent fire `dragstart` only because of changing icon. The first _draggable._onMove call will fire `dragstart` if icon was changed while dragging
+			this._draggable.off('dragstart',this._onDragStart, this);
+			this._draggable.once('dragstart',function(){
+				this._draggable.on('dragstart',this._onDragStart, this);
+			}, this);
+
+			this._draggable._lastDraggedTarget = draggedTarget;
+			var lastPosition = DomUtil.getPosition(this._draggable._element);
+			if (lastEvent) {
+				lastPosition = lastEvent;
+			}
+			this._draggable._onDown({type: 'mousedown', button: 1, clientX: lastPosition.x, clientY: lastPosition.y});
+		}
+	},
 });

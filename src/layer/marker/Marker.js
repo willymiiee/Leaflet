@@ -322,16 +322,20 @@ export var Marker = Layer.extend({
 		this.addInteractiveTarget(this._icon);
 
 		if (MarkerDrag) {
-			var draggable = this.options.draggable;
-			if (this.dragging) {
-				draggable = this.dragging.enabled();
-				this.dragging.disable();
-			}
+			if (this.dragging && this.dragging._draggable) {
+				this.dragging._updateIcon();
+			} else {
+				var draggable = this.options.draggable;
+				if(this.dragging){
+					draggable = this.dragging.enabled();
+					this.dragging.disable();
+				}
 
-			this.dragging = new MarkerDrag(this);
+				this.dragging = new MarkerDrag(this);
 
-			if (draggable) {
-				this.dragging.enable();
+				if (draggable) {
+					this.dragging.enable();
+				}
 			}
 		}
 	},

@@ -121,7 +121,6 @@ export var Draggable = Evented.extend({
 
 		var first = (e.touches && e.touches.length === 1 ? e.touches[0] : e),
 		    offset = new Point(first.clientX, first.clientY)._subtract(this._startPoint);
-
 		if (!offset.x && !offset.y) { return; }
 		if (Math.abs(offset.x) + Math.abs(offset.y) < this.options.clickTolerance) { return; }
 
@@ -143,13 +142,14 @@ export var Draggable = Evented.extend({
 
 			DomUtil.addClass(document.body, 'leaflet-dragging');
 
-			this._lastTarget = e.target || e.srcElement;
+			this._lastTarget = this._lastDraggedTarget || e.target || e.srcElement;
+			this._lastDraggedTarget = null;
 			// IE and Edge do not give the <use> element, so fetch it
 			// if necessary
 			if (window.SVGElementInstance && this._lastTarget instanceof window.SVGElementInstance) {
 				this._lastTarget = this._lastTarget.correspondingUseElement;
 			}
-			DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
+				DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
 		}
 
 		this._newPos = this._startPos.add(offset);

@@ -113,6 +113,39 @@ describe("Marker.Drag", function () {
 			toucher.wait(100).moveTo(300, 280, 0)
 				.down().moveBy(5, 0, 20).moveBy(290, 32, 1000).wait(100).up().wait(100);
 		});
+
+		it.only("changes the icon while dragging", function (done) {
+			var marker = L.marker([0, 0], {
+				draggable: true
+			}).addTo(map);
+
+			var newIcon = new L.Icon.Default();
+			marker.on('drag',function () {
+				marker.setIcon(newIcon);
+			});
+
+			var hand = new Hand({
+				timing: 'fastframe',
+				onStop: function () {
+					expect(marker.getIcon()).to.be(newIcon);
+
+					var center = map.getCenter();
+					expect(center.lat).to.be(0);
+					expect(center.lng).to.be(0);
+
+					var markerPos = marker.getLatLng();
+					// Marker drag is very timing sensitive, so we can't check
+					// exact values here, just verify that the drag is in the
+					// right ballpark
+					expect(markerPos.lat).to.be.within(-50, -30);
+					expect(markerPos.lng).to.be.within(340, 380);
+
+					done();
+				}
+			});
+			var toucher = hand.growFinger('mouse');
+			toucher.wait(100).moveTo(300, 280, 0).down().moveBy(261, 32, 1000).wait(2100).wait(100).up().wait(100);
+		});
 	});
 
 	it("checks if the offset of the first mousemove event is correct", function (done) {
