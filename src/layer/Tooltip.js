@@ -1,5 +1,5 @@
 import {DivOverlay} from './DivOverlay';
-import {toPoint} from '../geometry/Point';
+import {Point, toPoint} from '../geometry/Point';
 import {Map} from '../map/Map';
 import {Layer} from './Layer';
 import * as Util from '../core/Util';
@@ -67,6 +67,7 @@ export var Tooltip = DivOverlay.extend({
 	onAdd: function (map) {
 		DivOverlay.prototype.onAdd.call(this, map);
 		this.setOpacity(this.options.opacity);
+		this._preventClosing = !!this._preventClosing;
 
 		if (this.options.interactive) {
 			DomUtil.addClass(this._container, 'leaflet-interactive');
@@ -113,6 +114,7 @@ export var Tooltip = DivOverlay.extend({
 			// Fired when a tooltip bound to this layer is closed.
 			this._source.fire('tooltipclose', {tooltip: this}, true);
 		}
+		this._preventClosing = false;
 	},
 
 	getEvents: function () {
@@ -126,7 +128,7 @@ export var Tooltip = DivOverlay.extend({
 	},
 
 	_close: function () {
-		if (this._map) {
+		if (this._map && !this._preventClosing) {
 			this._map.closeTooltip(this);
 		}
 	},
@@ -140,7 +142,60 @@ export var Tooltip = DivOverlay.extend({
 
 	_updateLayout: function () {},
 
-	_adjustPan: function () {},
+	_adjustPan: function (e) {
+		if (!this.options.autoPan) {
+			return;
+		}
+		if (this._map._panAnim) {
+			this._map._panAnim.stop();
+		}
+
+
+		var containerWidth = this._container.offsetWidth;
+		var containerHeight = this._container.offsetHeight;
+		var size = this._map.getSize();
+		var padding = toPoint(this.options.autoPanPadding);
+		var containerPos = this._map.layerPointToContainerPoint(DomUtil.getPosition(this._container));
+		var direction = this.options.direction;
+
+		var offsetAnchor = 6;
+		var dx = 0, dy = 0;
+		if (containerPos.x + containerWidth	+ padding.x > size.x) { // right
+			dx = containerPos.x + containerWidth - size.x + padding.x;
+			if (direction === 'right') {
+				dx += offsetAnchor;
+			}
+		}
+		if (containerPos.x - dx - padding.x < 0) { // left
+			dx = containerPos.x	- padding.x;
+			if (direction === 'left') {
+				dx -= offsetAnchor;
+			}
+		}
+		if (containerPos.y + containerHeight + padding.y > size.y) { // bottom
+			dy = containerPos.y + containerHeight - size.y + padding.y;
+			if (direction === 'bottom') {
+				dy += offsetAnchor;
+			}
+		}
+		if (containerPos.y - dy	- padding.y < 0) { // top
+			dy = containerPos.y - padding.y;
+			if (direction === 'top') {
+				dy -= offsetAnchor;
+			}
+		}
+
+		if (dx || dy) {
+			this._preventClosing = true;
+			setTimeout(function () {
+				this._preventClosing = false;
+			}.bind(this), 500);
+
+			this._map
+				.fire('autopanstart')
+				.panBy([dx, dy], {animate: e && e.type === 'moveend'});
+		}
+	},
 
 	_setPosition: function (pos) {
 		var subX, subY,
