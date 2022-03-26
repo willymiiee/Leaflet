@@ -1,5 +1,4 @@
 import {toPoint as point} from '../../geometry/Point';
-import Browser from '../../core/Browser';
 import {svgCreate} from '../vector/SVG.Util';
 import {Icon} from './Icon';
 

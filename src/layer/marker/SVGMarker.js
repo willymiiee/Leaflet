@@ -2,7 +2,6 @@ import {Marker} from './Marker';
 import {falseFn, stamp} from '../../core/Util';
 import {SVGIcon} from './SVGIcon';
 import {toPoint as point} from '../../geometry/Point';
-import Browser from '../../core/Browser';
 import * as DomUtil from '../../dom/DomUtil';
 import {Bounds} from '../../geometry/Bounds';
 
@@ -16,7 +15,7 @@ export var SVGMarker = Marker.extend({
 
 	_animateZoom: falseFn,
 
-	_addIcon: function(){
+	_addIcon: function () {
 		this._path = this._icon;
 		this._renderer._addPath(this);
 		this._renderer._layers[stamp(this)] = this;
@@ -26,22 +25,22 @@ export var SVGMarker = Marker.extend({
 
 		if (this._icon) {
 			var iconPos = pos;
-			var marginTop = this._icon.getAttribute('marginTop');
-			var marginLeft = this._icon.getAttribute('marginLeft');
-			if (!isNaN(marginTop) && !isNaN(marginLeft)) {
-				var offset = point(parseInt(marginLeft), parseInt(marginTop));
-				iconPos = iconPos.add(offset);
+			var marginTopIcon = this._icon.getAttribute('marginTop');
+			var marginLeftIcon = this._icon.getAttribute('marginLeft');
+			if (!isNaN(marginTopIcon) && !isNaN(marginLeftIcon)) {
+				var offsetIcon = point(parseInt(marginLeftIcon), parseInt(marginTopIcon));
+				iconPos = iconPos.add(offsetIcon);
 			}
 			DomUtil.setPosition(this._icon, iconPos);
 		}
 
 		if (this._shadow) {
 			var shadowPos = pos;
-			var marginTop = this._shadow.getAttribute('marginTop');
-			var marginLeft = this._shadow.getAttribute('marginLeft');
-			if (!isNaN(marginTop) && !isNaN(marginLeft)) {
-				var offset = point(parseInt(marginLeft), parseInt(marginTop));
-				shadowPos = shadowPos.add(offset);
+			var marginTopShadow = this._shadow.getAttribute('marginTop');
+			var marginLeftShadow = this._shadow.getAttribute('marginLeft');
+			if (!isNaN(marginTopShadow) && !isNaN(marginLeftShadow)) {
+				var offsetShadow = point(parseInt(marginLeftShadow), parseInt(marginTopShadow));
+				shadowPos = shadowPos.add(offsetShadow);
 			}
 			DomUtil.setPosition(this._shadow, shadowPos);
 		}
@@ -66,9 +65,9 @@ export var SVGMarker = Marker.extend({
 	},
 	_updateBounds: function () {
 		var r = this._radius,
-			r2 = this._radiusY || r,
-			w = this._clickTolerance(),
-			p = [r + w, r2 + w];
+		r2 = this._radiusY || r,
+		w = this._clickTolerance(),
+		p = [r + w, r2 + w];
 		this._pxBounds = new Bounds(this._point.subtract(p), this._point.add(p));
 	},
 	_clickTolerance: function () {

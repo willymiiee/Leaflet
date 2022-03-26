@@ -278,7 +278,7 @@ export var Marker = Layer.extend({
 		}
 	},
 
-	_addIcon: function(){
+	_addIcon: function () {
 		this.getPane().appendChild(this._icon);
 	},
 
