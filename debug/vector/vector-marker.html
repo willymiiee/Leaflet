@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<link rel="stylesheet" href="../../dist/leaflet.css" />
+
+	<link rel="stylesheet" href="../css/screen.css" />
+	<script src="../../dist/leaflet-src.js"></script>
+</head>
+<body>
+	<div id="map" style="width: 800px; height: 600px; border: 1px solid #ccc"></div>
+
+	<script src="route.js"></script>
+	<script>
+		var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+			osmAttrib = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+			osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
+
+		var map = L.map('map')
+			.setView([43.1249, 1.254], 7);
+		map.addLayer(osm);
+
+		var rect = L.rectangle([[43.9249, 1.954],[42.1249, 0.254]]).addTo(map)
+
+		var icon = L.svgIcon({
+			iconUrl: 'https://leafletjs.com/SlavaUkraini/examples/custom-icons/leaf-green.png',
+			iconSize:     [38, 95], // size of the icon
+			shadowSize:   [50, 64], // size of the shadow
+			iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+			shadowAnchor: [4, 62],  // the same for the shadow
+			popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+		});
+		var svg = L.svgMarker(map.getCenter(), {icon: icon, pane: 'overlayPane'}).addTo(map)
+
+	</script>
+</body>
+</html>

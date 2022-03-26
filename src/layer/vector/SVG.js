@@ -126,11 +126,6 @@ export var SVG = Renderer.extend({
 		this._rootGroup.appendChild(layer._path);
 		layer.addInteractiveTarget(layer._path);
 	},
-	_addElement: function (layer, element) {
-		if (!this._rootGroup) { this._initContainer(); }
-		this._rootGroup.appendChild(element);
-		layer.addInteractiveTarget(element);
-	},
 
 	_removePath: function (layer) {
 		DomUtil.remove(layer._path);

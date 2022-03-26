@@ -6,5 +6,6 @@ export {Icon};
 
 export {DivIcon, divIcon} from './DivIcon';
 export {Marker, marker} from './Marker';
+export {SVGMarker, svgMarker} from './SVGMarker';
 export {SVGIcon, svgIcon} from './SVGIcon';
 

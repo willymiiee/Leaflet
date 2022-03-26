@@ -6,7 +6,6 @@ import {toPoint as point} from '../../geometry/Point';
 import * as DomUtil from '../../dom/DomUtil';
 import * as DomEvent from '../../dom/DomEvent';
 import {MarkerDrag} from './Marker.Drag';
-import {SVGIcon} from './SVGIcon';
 
 /*
  * @class Marker
@@ -109,12 +108,6 @@ export var Marker = Layer.extend({
 	initialize: function (latlng, options) {
 		Util.setOptions(this, options);
 		this._latlng = latLng(latlng);
-	},
-
-	beforeAdd: function (map) {
-		// Renderer is set here because we need to call renderer.getEvents
-		// before this.getEvents.
-		this._renderer = map.getRenderer(this);
 	},
 
 	onAdd: function (map) {
@@ -277,16 +270,16 @@ export var Marker = Layer.extend({
 
 
 		if (addIcon) {
-			if(options.icon instanceof SVGIcon){
-				this._renderer._addElement(this, this._icon);
-			}else{
-				this.getPane().appendChild(this._icon);
-			}
+			this._addIcon();
 		}
 		this._initInteraction();
 		if (newShadow && addShadow) {
 			this.getPane(options.shadowPane).appendChild(this._shadow);
 		}
+	},
+
+	_addIcon: function(){
+		this.getPane().appendChild(this._icon);
 	},
 
 	_removeIcon: function () {
@@ -317,15 +310,6 @@ export var Marker = Layer.extend({
 	_setPos: function (pos) {
 
 		if (this._icon) {
-
-			if(this.options.icon instanceof SVGIcon) {
-				var marginTop = this._icon.getAttribute('marginTop');
-				var marginLeft = this._icon.getAttribute('marginLeft');
-				if (!isNaN(marginTop) && !isNaN(marginLeft)) {
-					var offset = point(parseInt(marginLeft), parseInt(marginTop));
-					pos = pos.add(offset);
-				}
-			}
 			DomUtil.setPosition(this._icon, pos);
 		}
 
