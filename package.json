@@ -30,6 +30,9 @@
     "ssri": "^9.0.0",
     "uglify-js": "^3.15.2"
   },
+  "dependencies": {
+    "lethargy": "^1.0.9"
+  },
   "main": "dist/leaflet-src.js",
   "style": "dist/leaflet.css",
   "files": [

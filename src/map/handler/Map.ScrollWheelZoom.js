@@ -1,3 +1,4 @@
+import {default as Lethargy}  from '../../dom/DomEvent.Lethargy';
 import {Map} from '../Map';
 import {Handler} from '../../core/Handler';
 import * as DomEvent from '../../dom/DomEvent';
@@ -25,10 +26,15 @@ Map.mergeOptions({
 	// How many scroll pixels (as reported by [L.DomEvent.getWheelDelta](#domevent-getwheeldelta))
 	// mean a change of one full zoom level. Smaller values will make wheel-zooming
 	// faster (and vice versa).
-	wheelPxPerZoomLevel: 60
+	wheelPxPerZoomLevel: 60,
+
+
 });
 
 export var ScrollWheelZoom = Handler.extend({
+
+	magicMouseLethargy: new Lethargy(5, 100, 0.05),
+
 	addHooks: function () {
 		DomEvent.on(this._map._container, 'wheel', this._onWheelScroll, this);
 
@@ -41,6 +47,11 @@ export var ScrollWheelZoom = Handler.extend({
 
 	_onWheelScroll: function (e) {
 		var delta = DomEvent.getWheelDelta(e);
+		// this._detectTrackPad(e);
+
+		if (this.magicMouseLethargy.check(e) === false){
+			return;
+		}
 
 		var debounce = this._map.options.wheelDebounceTime;
 
@@ -82,6 +93,10 @@ export var ScrollWheelZoom = Handler.extend({
 		} else {
 			map.setZoomAround(this._lastMousePos, zoom + delta);
 		}
+	},
+
+	setLethargy(stability, sensitivity, tolerance, delay){
+		this.magicMouseLethargy = new Lethargy(stability, sensitivity, tolerance, delay);
 	}
 });
 
