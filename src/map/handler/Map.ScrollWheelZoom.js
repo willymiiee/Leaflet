@@ -42,11 +42,11 @@ export var ScrollWheelZoom = Handler.extend({
 	_onWheelScroll: function (e) {
 
 		// detect gesture
-		if (e.deltaMode === e.DOM_DELTA_PIXEL) {
+		if (e.deltaMode === e.DOM_DELTA_PIXEL && (Math.abs(e.deltaY) < 90 || Math.abs(e.deltaY) > 110 || this._map._touchpadActive)) {
 			return;
 		}
 
-		var delta = e.deltaY;
+		var delta = DomEvent.getWheelDelta(e);
 		var debounce = this._map.options.wheelDebounceTime;
 
 		this._delta += delta;
