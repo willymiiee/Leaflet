@@ -7,8 +7,7 @@
 
 	<link rel="stylesheet" href="../css/screen.css" />
 
-	<script type="text/javascript" src="../../build/deps.js"></script>
-	<script src="../leaflet-include.js"></script>
+	<script src="../../dist/leaflet-src.js"></script>
 </head>
 <body>
 
@@ -16,19 +15,19 @@
 	<button onclick="geojsonLayerBounds();">Show GeoJSON layer bounds</button>
 	<button onclick="featureGroupBounds();">Show feature group bounds</button>
 
-	<script type="text/javascript" src="geojson-sample.js"></script>
-	<script type="text/javascript">
+	<script src="geojson-sample.js"></script>
+	<script>
 
-		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/d4fc77ea4a63471cab2423e66626cbb6/997/256/{z}/{x}/{y}.png',
-			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+		var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+			osmAttrib = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+			osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib}),
 			rectangle,
 			featureGroup;
 
 		var map = new L.Map('map', {
 			center: new L.LatLng(0.78, 102.37),
 			zoom: 7,
-			layers: [cloudmade]
+			layers: [osm]
 		});
 
 		var geojson = L.geoJson(geojsonSample, {

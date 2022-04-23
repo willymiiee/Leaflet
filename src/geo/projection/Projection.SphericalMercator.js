@@ -1,19 +1,33 @@
+import {LatLng} from '../LatLng';
+import {Bounds} from '../../geometry/Bounds';
+import {Point} from '../../geometry/Point';
+
 /*
- * Spherical Mercator is the most popular map projection, used by EPSG:3857 CRS used by default.
+ * @namespace Projection
+ * @projection L.Projection.SphericalMercator
+ *
+ * Spherical Mercator projection — the most common projection for online maps,
+ * used by almost all free and commercial tile providers. Assumes that Earth is
+ * a sphere. Used by the `EPSG:3857` CRS.
  */
 
-L.Projection.SphericalMercator = {
+var earthRadius = 6378137;
 
-	R: 6378137,
+export var SphericalMercator = {
+
+	R: earthRadius,
+	MAX_LATITUDE: 85.0511287798,
 
 
 	project: function (latlng, magnetPoint) {
+		//TODO 04/2022: Merge with new logic from main branch
 		if (latlng._projectedPoint) {
 			return latlng._projectedPoint.clone();
 		}
 		var d = Math.PI / 180,
-			max = 1 - 1E-15,
-			sin = Math.max(Math.min(Math.sin(latlng.lat * d), max), -max),
+			max = this.MAX_LATITUDE,
+			lat = Math.max(Math.min(max, latlng.lat), -max),
+			sin = Math.sin(lat * d),
 			y = this.R * Math.log((1 + sin) / (1 - sin)) / 2,
 			x = this.R * latlng.lng * d;
 
@@ -44,10 +58,8 @@ L.Projection.SphericalMercator = {
 		return latlng;
 	},
 
-
 	bounds: (function () {
-		var d = 6378137 * Math.PI;
-		return L.bounds([-d, -d], [d, d]);
+		var d = earthRadius * Math.PI;
+		return new Bounds([-d, -d], [d, d]);
 	})()
-
 };
