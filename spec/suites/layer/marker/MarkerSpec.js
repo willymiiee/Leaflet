@@ -1,3 +1,4 @@
+/* global touchPointerMap */
 describe("Marker", function () {
 	var map,
 	    container,
@@ -351,5 +352,27 @@ describe("Marker", function () {
 			});
 			happen.mousemove(marker._icon);
 		});
+
+
+		it.skipIfNotTouch("DOM touch events fired on marker", function () {
+			var spyStart = sinon.spy();
+			var spyMove = sinon.spy();
+			var spyEnd = sinon.spy();
+			var spyCancel = sinon.spy();
+			var layer = new L.Marker([1, 2]).addTo(map);
+			layer.on("touchstart", spyStart);
+			layer.on("touchmove", spyMove);
+			layer.on("touchend", spyEnd);
+			layer.on("touchcancel", spyCancel);
+			happen.at(touchPointerMap['touchstart'], 200, 190);
+			happen.at(touchPointerMap['touchmove'], 200, 190);
+			happen.at(touchPointerMap['touchend'], 200, 190);
+			happen.at(touchPointerMap['touchcancel'], 200, 190);
+			expect(spyStart.calledOnce).to.be.ok();
+			expect(spyMove.calledOnce).to.be.ok();
+			expect(spyEnd.calledOnce).to.be.ok();
+			expect(spyCancel.calledOnce).to.be.ok();
+		});
+
 	});
 });
